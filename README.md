@@ -6,6 +6,10 @@ With this little CMS, that you can download and modify and use at your disposal,
   - Manage Pages, creating automatically a nav menu
   - Manage blog Posts
   - Manage Users (Admins, Editors and Bloggers)
+  
+# Repo
+
+Official Repo URL: https://github.com/alemux/flaskcms
 
 # Database
 
