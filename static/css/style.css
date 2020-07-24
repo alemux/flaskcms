@@ -73,7 +73,7 @@ i.fas.fa-eye-slash.is_hidden {
     display: block;
 }
 
-input[type="email"], input[type="password"], input[type="text"], select, input[type="file"], input[type="number"] {
+input[type="email"], input[type="password"], input[type="text"], select.form-control, input[type="file"], input[type="number"] {
     background-color: #eeeeee;
     padding: 10px;
     width: 50%;

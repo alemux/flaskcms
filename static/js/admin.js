@@ -213,6 +213,71 @@ Admin.user.delete = function(id){
 
 }
 
+Admin.user.view = function(id){
+
+    document.location.href = '/admin/users/' + id;
+
+}
+
+
+Admin.user.save = function(){
+
+    var valid = 1, description;
+    $('#frmLoginMsg').addClass("hidden");
+    $("input, selected").removeClass("redborder");
+
+
+    let email = document.getElementById("email").value;
+    let regex = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})/g;
+    if(email.match(regex) !== null){
+        if(email.match(regex).length===0){
+            valid = 0;
+            description = "E-mail address not valid";
+            $("#email").addClass("redborder");
+        }
+    }else{
+        valid = 0;
+        description = "E-Mail not valid";
+        $("#email").addClass("redborder");
+    }
+
+    let name = document.getElementById("name").value;
+    if(name.length === 0){
+        valid = 0;
+        description = "Name cannot be empty";
+        $("#name").addClass("redborder");
+    }
+
+    let password = document.getElementById("password").value;
+    let password2 = document.getElementById("password2").value;
+
+    if(password.length > 0 || password2.length > 0){
+
+        if(password.length < 5){
+            valid = 0;
+            description = "Password cannot be less than 5 characters";
+            $("#password").addClass("redborder");
+        }
+
+        if(password !== password2){
+            valid = 0;
+            description = "Confirmed password is different: pay attention!";
+            $("#password, #password2").addClass("redborder");
+        }   
+
+    }
+
+    if(valid === 1){
+
+        $("#frm1").submit();
+
+    }else{
+        $('#frmLoginMsg').html(description).removeClass("hidden");
+    }
+
+
+}
+
 /*
 ################################################################################################
 MANAGE PROFILE

@@ -1,0 +1,67 @@
+{% extends "admin-base.html" %}
+
+{% block content %}
+<div class="col-md-9 col-lg-9">
+
+    <h1>User detail</h1>
+
+    <form method="POST" action="/admin/users/save" name="frm1" id="frm1" enctype="multipart/form-data">
+        <input type="hidden" name="idusers" value="{{profile.id}}" />
+        
+        {%if profile.photo != None and profile.photo != '' %}
+        <img src="/static/uploads/{{profile.photo}}" class="page-pic" />
+        {% endif  %}
+       
+        <div class="form-group">
+            <label for="pic">Level</label>
+            <select class="form-control" id="user_level" name="user_level">
+            {% for item in user_level %}
+            
+            <option value="{{item.idusers_level}}" {% if item.idusers_level == profile.idusers_level %}selected="selected"{% endif %} >{{item.label}}</option>
+            
+            
+            {% endfor %}    
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" aria-describedby="Your name" placeholder="Enter your name" value="{{profile.name}}">        
+        </div>
+
+        <div class="form-group">
+            <label>Active user?</label>
+            <select class="form-control" name="active" id="active">
+                {% if profile.active == 1 %}
+                <option value="1" selected>YES</option>
+                <option value="0">NO</option>
+                {% else %}
+                <option value="1">YES</option>
+                <option value="0" selected>NO</option>
+                {% endif %}
+            </select>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="{{profile.email}}">
+          
+        </div>
+        <div class="form-group">
+          <label for="password">Change Password</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Change your Password">
+        </div>
+
+        <div class="form-group">
+            <label for="password2">Confirm password</label>
+            <input type="password" class="form-control" id="password2" placeholder="Confirm Password">
+          </div>
+       
+        <p><button type="button" class="btn btn-primary" onClick="Admin.user.save()"><i class="far fa-share-square"></i> Save changes</button></p>
+        <p class="alert alert-danger hidden" id="frmLoginMsg"></p>
+
+      </form>
+    
+
+</div>
+{% endblock %}

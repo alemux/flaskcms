@@ -41,7 +41,12 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///cms.db")
+
+# pythonanywhere connection
+# db = SQL('sqlite:///%s/mysite/cms.db' % os.getcwd())
+
+# local and heroku
+db = SQL('sqlite:///%s/cms.db' % os.getcwd())
 
 
 @app.route("/")
@@ -152,8 +157,14 @@ def admin_home():
 
     this_page = admin_default_tags()
 
-    # load online posts in admin/home
-    rows = db.execute("SELECT post.*, users.name FROM post, users WHERE post.idusers = users.id AND post.is_visible=1 ORDER BY post.date DESC LIMIT 10")
+    # load online posts in admin/home    
+    if session['user_level'] < 3:
+        sql = "SELECT post.*, users.name FROM post, users WHERE post.idusers = users.id AND post.is_visible=1 ORDER BY post.date DESC LIMIT 20"
+        rows = db.execute(sql)
+    else:
+        sql = "SELECT post.*, users.name FROM post, users WHERE post.idusers = users.id AND post.is_visible=1 AND post.idusers=:id_linked_user ORDER BY post.date DESC LIMIT 20"
+        rows = db.execute(sql,
+                        id_linked_user = session['user_id'])    
 
     return render_template("admin-home.html", opt = opt, menu = menu, page = this_page, rows = rows)
 
@@ -168,8 +179,14 @@ def admin_drafts():
 
     this_page = admin_default_tags()
 
-    # load online posts in admin/home
-    rows = db.execute("SELECT post.*, users.name FROM post, users WHERE post.idusers = users.id AND post.is_visible=0 ORDER BY post.date DESC LIMIT 10")
+    # load online posts in admin/home    
+    if session['user_level'] < 3:
+        sql = "SELECT post.*, users.name FROM post, users WHERE post.idusers = users.id AND post.is_visible=0 ORDER BY post.date DESC LIMIT 20"
+        rows = db.execute(sql)
+    else:
+        sql = "SELECT post.*, users.name FROM post, users WHERE post.idusers = users.id AND post.is_visible=0 AND post.idusers=:id_linked_user ORDER BY post.date DESC LIMIT 20"
+        rows = db.execute(sql,
+                        id_linked_user = session['user_id'])
 
     return render_template("admin-drafts.html", opt = opt, menu = menu, page = this_page, rows = rows)
 
@@ -367,6 +384,11 @@ def admin_post_mod(post_id):
 @login_required
 def admin_pages():
 
+    # SECURITY USER LEVEL CHECK
+    if session["user_level"] != 1:
+        return redirect("/admin/home")
+
+
     # load global options
     opt = global_options(db)
     menu = global_menu(db)
@@ -384,16 +406,17 @@ def admin_pages():
 @login_required
 def admin_page_mod(page_id):
 
-    print(f"page_id:{page_id}")
+    # SECURITY USER LEVEL CHECK
+    if session["user_level"] != 1:
+        return redirect("/admin/home")
+    
+
     # load global options
     opt = global_options(db)
     menu = global_menu(db)
     this_page = admin_default_tags()
 
     # load single post and load template
-    print(f"user_id {session['user_id']}")
-    print(f"user_level {session['user_level']}")
-
     if session['user_level'] == 1:
         sql = "SELECT * FROM pages WHERE idpages = :idpages"
         post = db.execute(sql,
@@ -407,6 +430,10 @@ def admin_page_mod(page_id):
 @app.route("/admin/page_save", methods=["GET", "POST"])
 @login_required
 def admin_page_save():
+
+    # SECURITY USER LEVEL CHECK
+    if session["user_level"] != 1:
+        return redirect("/admin/home")
 
     if request.method == "POST":
 
@@ -499,6 +526,10 @@ def admin_page_save():
 @login_required
 def admin_page_content(id):
 
+    # SECURITY USER LEVEL CHECK
+    if session["user_level"] != 1:
+        return redirect("/admin/home")
+
     sql = "SELECT text FROM pages WHERE idpages = :idpages "
     content = db.execute(sql, 
             idpages = id)
@@ -575,7 +606,8 @@ def admin_users():
 @login_required
 def admin_users_create():
 
-    today = datetime.date.today()
+    today = datetime.today()
+    
     rows = db.execute("INSERT INTO users (active, email, name, idusers_level, password ) VALUES (0, '', 'new user', 3, :hps)",
                     hps = generate_password_hash(str(today)))
 
@@ -605,6 +637,61 @@ def admin_users_delete():
 
 
 
+
+# /admin/users/save
+@app.route("/admin/users/save", methods=["GET", "POST"])
+@login_required
+def admin_users_save():
+
+    idusers = request.form.get("idusers")
+    user_level = request.form.get("user_level")
+    active = request.form.get("active")
+    name = request.form.get("name")
+    if len(name) == 0:
+        return apology("Name value is not valid", 500)
+    
+    email = request.form.get("email")
+    if len(email) == 0:
+        return apology("E-mail value is not valid", 500)
+    
+    password = request.form.get("password")
+    if len(password) == 0:
+        sql = "UPDATE users SET active = :active, idusers_level = :user_level, name = :name, email = :email " 
+        sql = sql + " WHERE id = :id"
+        updatePost = db.execute(sql, 
+                id = idusers, name = name, email = email, user_level = user_level, active = active)
+
+    else:
+        sql = "UPDATE users SET active = :active, idusers_level = :user_level, name = :name, email = :email, password = :password " 
+        sql = sql + " WHERE id = :id"
+        updatePost = db.execute(sql, 
+                id = idusers, name = name, email = email, password = generate_password_hash(password), user_level = user_level, active = active)
+
+    return redirect("/admin/users")
+
+
+
+
+@app.route("/admin/users/<id>", methods=["GET", "POST"])
+@login_required
+def admin_users_detail(id):
+
+    opt = global_options(db)
+    menu = global_menu(db)
+    this_page = admin_default_tags()
+
+    sql = "SELECT * FROM users WHERE id = :id "
+    content = db.execute(sql, 
+            id = id)
+    
+    if len(content) == 0:
+        return apology("User not found", 500)
+    
+    # load user levels
+    user_level = db.execute("SELECT * FROM users_level ORDER BY idusers_level ASC")
+
+    return render_template("admin-users-detail.html", profile = content[0], user_level = user_level, opt = opt, menu = menu, page = this_page)
+    
 
 ################### PROFILE
 
