@@ -13,11 +13,11 @@ With this little CMS, that you can download and modify and use at your disposal,
 
 # To Do
 
-  - Verify user levels: Admin can do anything, Editor can manage everything in the blog but cannot manage Pages, Bloggers can only manage their own blog posts.
   - Pages need to have their own photogallery and attachments list: integrate a multiple upload
   - Database: move to MySQL!
   - Statistics
   - Sharing buttons
+  - Some page parts are still fixed in templates: this must be corrected and configured in db
 
 
 ### Installation
