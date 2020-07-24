@@ -1,0 +1,49 @@
+{% extends "admin-base.html" %}
+
+{% block content %}
+<div class="col-md-9 col-lg-9">
+
+    <h1>My profile</h1>
+
+    <form method="POST" action="/admin/profile_save" name="frm1" id="frm1" enctype="multipart/form-data">
+        
+        {%if profile.photo != None and profile.photo != '' %}
+        <img src="/static/uploads/{{profile.photo}}" class="page-pic" />
+        {% endif  %}
+
+        <div class="form-group pic-group">
+            
+            <label for="pic">Change pic</label>
+            <input type="file" class="form-control" id="pic" name="pic" >
+            
+          </div>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" aria-describedby="Your name" placeholder="Enter your name" value="{{profile.name}}">
+            
+          </div>
+
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value="{{profile.email}}">
+          
+        </div>
+        <div class="form-group">
+          <label for="password">Change your Password</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Change your Password">
+        </div>
+
+        <div class="form-group">
+            <label for="password2">Confirm password</label>
+            <input type="password" class="form-control" id="password2" placeholder="Confirm Password">
+          </div>
+       
+        <p><button type="button" class="btn btn-primary" onClick="Admin.profile.save()"><i class="far fa-share-square"></i> Save changes</button></p>
+        <p class="alert alert-danger hidden" id="frmLoginMsg"></p>
+
+      </form>
+    
+
+</div>
+{% endblock %}

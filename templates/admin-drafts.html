@@ -1,0 +1,50 @@
+{% extends "admin-base.html" %}
+
+{% block content %}
+<!-- CONTENT -->
+<div class="col-md-9 col-lg-9">
+
+    <h1>Post drafts<button class="btn btn-md btn-primary float-right" onclick="Admin.post.create()"><i class="fas fa-plus-circle"></i> Create post draft</button></h1>
+
+    <div class="table-responsive-sm">
+    <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Date</th>
+            <th scope="col">Title</th>
+            <th scope="col">Author</th>
+            <th scope="col">Cmnds</th>
+
+          </tr>
+        </thead>
+        <tbody>
+
+          {% if rows|length == 0%}
+          <tr>
+            <td colspan="5">No drafts available</td>
+          </tr>
+          {% endif %}
+
+          {% for row in rows %}
+          <tr>
+            <td scope="row">{{row["idpost"]}}</td>
+            <td>{{row["date"]}}</td>
+            <td>{{row["title"]}}</td>
+            <td>{{row["name"]}}</td>
+            <td>
+                <button type="button" class="btn btn-sm btn-primary" onclick="Admin.post.view({{row["idpost"]}})"><i class="far fa-eye"></i></button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="Admin.post.delete({{row["idpost"]}})"><i class="fa fa-trash"></i></button>
+            </td>
+          </tr>
+
+
+          {% endfor %}
+
+
+        </tbody>
+      </table>
+    </div>
+
+</div>
+{% endblock %}

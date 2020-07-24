@@ -1,0 +1,177 @@
+{% extends "admin-base.html" %}
+
+
+{% block content %}
+
+<!-- CONTENT -->
+<div class="col-md-9 col-lg-9">
+
+    <h1>Modify page</h1>
+
+    <form method="POST" action="/admin/page_save" name="frm1" id="frm1" enctype="multipart/form-data">
+      <input type="hidden" name="idpages" value="{{post[0].idpages}}" />
+      <input type="hidden" name="editor_html" id="editor_html" value="" />
+      <input type="hidden" id="locked" name="page_locked" value="{{post[0].locked}}" />
+
+        {% if post[0].locked == 1 %}
+        <div class="form-group">
+            <h2>{{post[0].title}}</h2>
+            <p><i class="fas fa-user-lock"></i> This page is locked</p>
+        </div>
+        {% endif  %}
+
+        {%if post[0].photo != None and post[0].photo != '' %}
+        <img src="/static/uploads/{{post[0].photo}}" class="page-pic" />
+        <p>Photo: {{post[0].photo}}</p>
+        {% endif  %}
+
+        <div class="form-group pic-group">
+
+            <label for="pic">Change pic</label>
+            <input type="file" class="form-control" id="pic_field" name="pic" >
+
+        </div>
+
+        {% if post[0].locked == 0 %}
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control to-url" id="title" name="title" aria-describedby="Page title" placeholder="Enter a valid title"
+            value="{{post[0].title}}" >
+        </div>
+
+        <div class="form-group">
+          <label for="subtitle">Subtitle</label>
+          <input type="text" class="form-control to-url" id="subtitle" name="subtitle" aria-describedby="Page subtitle" placeholder="Enter a valid subtitle"
+          value="{{post[0].subtitle}}" >
+      </div>
+
+        <div class="form-group">
+            <label for="url">Page URL</label>
+
+            {% if post[0].url == None %}
+            <input type="text" class="form-control" id="url" name="url" aria-describedby="Page title" placeholder="Enter a valid URL"
+            value="">
+            {% else  %}
+            <input type="text" class="form-control" id="url" name="url" aria-describedby="Page title" placeholder="Enter a valid URL"
+            value="{{post[0].url}}">
+            {% endif %}
+
+            <small>URL is usually locked to avoid URL changes: please unlock URL to adapt title to an URL friendly version.</small>
+
+            {% if post[0].url == None %}
+            <div class="form-group-subitem" id="lock-container">
+                <span class="radio_item"><i class="fas fa-lock-open"></i> Unlocked <input type="radio" id="url_locked" name="url_locked"
+                value="1" checked></span> | <span class="radio_item"><input type="radio" id="url_locked" name="url_locked"
+                value="0" > <i class="fas fa-lock"></i> Locked</span>
+            {% else  %}
+            <div class="form-group-subitem" id="lock-container">
+                <span class="radio_item"><i class="fas fa-lock-open"></i> Unlocked <input type="radio" id="url_locked" name="url_locked"
+                value="1" ></span> | <span class="radio_item"><input type="radio" id="url_locked" name="url_locked"
+                value="0" checked> <i class="fas fa-lock"></i> Locked</span>
+            {% endif %}
+
+
+            </div>
+        </div>
+        {% endif  %}
+        
+
+        <div class="form-group">
+          <label for="text">Content</label>
+          <div id="editor"></div>
+          
+        </div>
+
+
+        {% if post[0].locked == 0 %}
+        <div class="form-group">
+            <label>Is visible?</label>
+            <select id="is_visible" name="is_visible">
+                {%if post[0].is_visible == 1  %}
+                <option value="0">NO</option>
+                <option value="1" selected>YES</option>
+                {% else %}
+                <option value="0" selected>NO</option>
+                <option value="1">YES</option>
+                {% endif %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Is a menu item?</label>
+            <select id="menu_item" name="menu_item">
+                {%if post[0].menu_item == 1  %}
+                <option value="0">NO</option>
+                <option value="1" selected>YES</option>
+                {% else %}
+                <option value="0" selected>NO</option>
+                <option value="1">YES</option>
+                {% endif %}
+            </select>
+        </div>
+
+        {% endif  %}
+
+        <h4>Meta tags</h4>
+        <div class="form-group">
+            <label for="meta_title">Meta: title</label>
+            <input type="text" class="form-control" id="meta_title" name="meta_title" aria-describedby="Meta tags: title" placeholder="Enter a valid title"
+            value="{{post[0].meta_title}}">
+        </div>
+
+        <div class="form-group">
+            <label for="meta_title">Meta: description</label>
+            <input type="text" class="form-control" id="meta_description" name="meta_description" aria-describedby="Meta tags: description" placeholder="Enter a valid description"
+            value="{{post[0].meta_description}}">
+        </div>
+
+        <div class="form-group">
+            <label for="meta_keywords">Meta: title</label>
+            <input type="text" class="form-control" id="meta_keywords" name="meta_keywords" aria-describedby="Meta tags: keywords" placeholder="Enter some keywords"
+            value="{{post[0].meta_keywords}}">
+        </div>
+
+        <p>
+        <button type="button" class="btn btn-primary" onClick="Admin.page.save()"><i class="far fa-share-square"></i> Save your changes</button>
+        </p>
+        <p class="alert alert-danger hidden" id="frmLoginMsg"></p>
+
+        {% if post[0].locked == 0 %}
+        <h4>Page delete</h4>
+        <p>Note: if you delete this page, you cannot retrieve it in any way: are you sure?</p>
+        <button type="button" class="btn btn-danger" onclick="Admin.post.delete({{post[0].idpost}})" id="btnSubmit"><i class="far fa-trash-alt"></i> Delete this page</button>
+        {% endif  %}
+
+
+      </form>
+
+
+</div>
+
+
+{% endblock %}
+
+      
+{% block includes %}
+
+
+{% if post[0].text|length != 0 %}
+<script>
+  $(document).ready(function(){
+    if(quill){
+      console.log("{{post[0].text}}");
+      //quill.clipboard.dangerouslyPasteHTML(0,'{{post[0].text}}');
+
+      Admin.page.load_content(quill, {{post[0].idpages}});
+
+
+    }
+    
+  })
+  
+</script>
+{% endif %}
+
+{% endblock %}
+
+

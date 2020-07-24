@@ -1,0 +1,54 @@
+{% extends "admin-base.html" %}
+
+{% block content %}
+<!-- CONTENT -->
+<div class="col-md-9 col-lg-9">
+
+    <h1>Pages<button class="btn btn-md btn-primary float-right" onclick="Admin.page.create()"><i class="fas fa-plus-circle"></i> Create page</button></h1>
+
+    <div class="table-responsive-sm">
+    <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Locked</th>
+            <th scope="col">Menu item</th>
+            <th scope="col">Visible</th>
+            <th scope="col">Cmnds</th>
+
+          </tr>
+        </thead>
+        <tbody>
+
+          {% if rows|length == 0%}
+          <tr>
+            <td colspan="6">No pages available</td>
+          </tr>
+          {% endif %}
+
+          {% for row in rows %}
+          <tr>
+            <td scope="row">{{row['idpages']}}</td>
+            <td>{{row['title']}}</td>
+            <td>{% if row['locked'] == 1 %}<i class="fas fa-user-lock"></i>{% endif %} </td>
+            <td>{% if row['menu_item'] == 1 %}YES{% else %}NO{% endif %} </td>
+            <td>{% if row['is_visible'] == 1 %}YES{% else %}NO{% endif %} </td>
+            
+            <td>
+                <button type="button" class="btn btn-sm btn-primary" onclick="Admin.page.view({{row["idpages"]}})"><i class="far fa-eye"></i></button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="Admin.page.delete({{row["idpages"]}})"><i class="fa fa-trash"></i></button>
+            </td>
+          </tr>
+
+
+          {% endfor %}
+
+
+        </tbody>
+      </table>
+    </div>
+
+</div>
+
+{% endblock %}

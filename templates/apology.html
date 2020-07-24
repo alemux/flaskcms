@@ -1,0 +1,14 @@
+
+{% extends "public-base.html" %}
+
+{% block main %}
+    <div style="text-align: center; padding: 40px;">
+
+    <h5>Oh no, an error has occured :(</h5>
+    <h2>{{bottom}}</h2>
+    
+    <div class="label label-danger">
+        Please <a href="javascript:history.back(-1)">go back and retry</a>
+    </div>
+    </div>
+{% endblock %}
